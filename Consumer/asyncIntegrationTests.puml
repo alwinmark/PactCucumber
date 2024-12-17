@@ -1,0 +1,74 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+!pragma teoz true
+
+autonumber
+box Consumer
+participant TestEnvironment as te
+participant PricingService as pi
+participant ProductMock as mc
+end box
+
+
+box Provider
+participant MockReplay as mp
+participant ProductService as po
+end box
+
+group Given a Product A with id 1 and price 20€
+    note over mp: What if additional things need to be setup?\nDo we need specialized information on consumer side?
+    note over mp: This could also be a cucumber step, to reuse existing functionality
+    te -> mc: setup <font color=red>TestProduct</font>
+    & mc --> mp: store addProduct(<font color=red>Product(1, 20€)</font>)
+    & mp -> po: addProduct(<font color="red">Product(1, 20€)</font>)
+end group
+
+group When Discount is 20%
+    te -> pi: setDiscount(20%)
+    activate pi
+    pi -> mc: getAllProducts()
+    activate mc
+
+        & mc --> mp: store getAllProducts(): [<font color=red>Product(1,20€)</font>]
+        activate mp
+            mp -> po: getAllProducts()
+            activate po
+            mp <-- po: return [<font color=red>Product(1, 20€)</font>]
+            deactivate po
+        mp -> mp: check if it matches expected Response
+        deactivate mp
+
+    & mc --> pi: return <font color=red>Product(1,20€)</font> as defined
+    deactivate mc
+
+    pi -> mc: setDiscountOnProductId(<font color=red>1</font>)
+    deactivate pi
+    activate mc
+    mc -> mc: mutate mockstate of Product to \n<font color=red>Product(1,18€)</font> for later expected responses
+    mc --> mp: store updateProduct(<font color=red>Product(1, 18€)</font>)
+    deactivate mc
+    & mp -> po: updateProduct(<font color=red>Product(1, 18€)</font>)
+
+end group
+
+group Then Product A should have price 18€
+    te -> mc: getProduct(<font color=red>1</font>)
+    activate mc
+
+        mc --> mp: store getProduct(1): <font color=red>Product(?, 18€)</font>
+        note right: Matcher only matches expected Price
+        activate mp
+            mp -> po: getProduct(1)
+            activate po
+            po --> mp: <font color=red>Product(1, 18€)</font>
+            deactivate po
+        mp -> mp: check response with expected response.\nAs only Price is matched it checks if Price is 18€
+        deactivate mp
+
+    mc --> te: <font color=red>Product(1, 18€)</font>
+    note right: Product which was stored at Step 12 is returned.
+    deactivate mc
+
+
+
+@enduml

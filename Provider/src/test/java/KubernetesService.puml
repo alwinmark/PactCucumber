@@ -1,0 +1,10 @@
+@startuml
+!pragma layout smetana
+
+Component "KubernetesReadyApplication" as App {
+    port "readyness" as readyness
+    port "liveness" as liveness
+}
+
+
+@enduml

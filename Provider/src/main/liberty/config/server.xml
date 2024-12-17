@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<server description="Open Liberty REST example for showcasing Cucumber with Pact">
+    <!--The Liberty Maven Plugin has generated Liberty features necessary for your application in configDropins/overrides/generated-features.xml-->
+    <featureManager>
+        <feature>cdi-4.0</feature>
+        <feature>mpMetrics-5.0</feature>
+        <!--feature>mpOpenAPI-5.0</feature>
+        <feature>mpOpenTracing-5.0</feature-->
+        <feature>jsonb-3.0</feature>
+        <feature>restfulWS-3.1</feature>
+    </featureManager>
+    <webApplication contextRoot="/" location="product.war"/>
+    <httpEndpoint host="*" httpPort="${default.http.port}" httpsPort="${default.https.port}" id="defaultHttpEndpoint"/>
+    <quickStartSecurity userName="metrics" userPassword="metrics"/>
+    <!-- No Database yet
+    <dataSource id="personDS" jndiName="jdbc/personDS">
+        <jdbcDriver libraryRef="postgresqlLib" />
+        <properties.postgresql databaseName="persondb" serverName="localhost" portNumber="5432" user="postgres" password="secret" />
+    </dataSource>
+    <library id="postgresqlLib">
+        <file name="${shared.resource.dir}/postgresql-42.2.18.jar" />
+    </library-->
+</server>
